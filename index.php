@@ -26,7 +26,7 @@
     
     <div class="lastEdit">
     <?php
-        echo "Last Modified: ".date("F d Y H:i:s.",filemtime("index.php"));
+        echo "Last Modified (GMT): ".date("F d Y H:i:s.", (getlastmod() + 18000));
         
         ?>
     </div>
