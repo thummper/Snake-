@@ -9,14 +9,13 @@
         * {
             padding: 0;
             margin: 0;
-             font-family: "Arial";
+            font-family: "Arial";
         }
         
         canvas {
             background: #eee;
             display: block;
             margin: 0 auto;
-           
             margin-top: 30px;
             margin-bottom: 50px;
             border: 2px solid black;
@@ -26,17 +25,13 @@
             display: block;
             text-align: center;
             padding-top: 20px;
-            
-           
         }
+        
         .controls {
             position: absolute;
             top: 50%;
             left: 100px;
-    
-            
         }
-    
 
     </style>
 </head>
@@ -48,7 +43,7 @@
         
         ?>
     </div>
-    
+
     <div class="controls">
         Movement:
         <br> WASD OR Arrow Keys.
@@ -56,7 +51,7 @@
 
     </div>
     <canvas id="myCanvas" width="686" height="588"></canvas>
-   
+
 
 
 
@@ -111,28 +106,52 @@
         function gameLoop() {
             //Will do stuff
             //Clear canvas 
-            if (gameState) {
+            if (gameState == 1) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 moveSnake();
                 drawSnake();
                 snakeEat();
                 drawFood();
-            } else {
+            } else if (gameState == 0) {
                 //Game is PAUSED
+            } else if (gameState == 2) {
+                //GAMEOVER
+                drawGameOver();
             }
 
 
         }
         setInterval(gameLoop, 100);
 
+        function drawGameOver() {
+            ctx.beginPath();
+            ctx.fillStyle = "black";
+            ctx.fillRect(canvas.width / 2 - 150, canvas.height / 2 - 50, 300, 50);
+            ctx.fill();
+            
+            ctx.fillRect(canvas.width/2 - 75, canvas.height/2 + 20, 150, 30);
+            ctx.fill();
+            
+            
+            ctx.beginPath();
+            ctx.font = "30px arial";
+            ctx.fillStyle = "red";
+            ctx.fillText("Game Over", canvas.width/2 - 70, canvas.height/2 - 12);
+            ctx.font = "16px arial";
+            ctx.fillText("Restart?", canvas.width/2 - 28, canvas.height/2 + 40);
+            
+            
+        }
+
         function snakeEat() {
-            if (snake.x == foodx && snake.y == foody) {
-                //EAT 
-
-                snake.length++;
-
-                pickFoodLocation();
+            for (i in tail) {
+                if (tail[i][0] == foodx && tail[i][1] == foody) {
+                    //EAT
+                    snake.length++;
+                    pickFoodLocation();
+                }
             }
+
         }
 
 
@@ -142,7 +161,9 @@
             var move = false;
 
             if ((snake.x + snake.xspeed * snake.scale) > (canvas.width - 14) || (snake.x + snake.xspeed * snake.scale) < 0) {
-                //Dont Move
+                //Dont Move - Hit wall
+                console.log("HitWall");
+                gameState = 2;
 
             } else {
                 snake.x += snake.xspeed * snake.scale;
@@ -155,7 +176,9 @@
             }
 
             if ((snake.y + snake.yspeed * snake.scale) < 0 || (snake.y + snake.yspeed * snake.scale) > (canvas.height - 14)) {
-                //Dont Move 
+                //Dont Move - Hit wall
+                console.log("HitWall");
+                gameState = 2;
 
             } else {
                 snake.y += snake.yspeed * snake.scale;
@@ -166,10 +189,15 @@
 
 
             }
+
+
+
+
             if (move) {
                 shiftArray();
                 console.log("SNAKE MOVE, X: " + snake.x + " Y: " + snake.y);
             }
+            //After Array updated check if snake has hit itself.
 
             //IF SNAKE MOVES CHECK IF IT IS TOUCHING FOOD 
             //IF FOOD EATEN PICK NO CO-ORDS 
