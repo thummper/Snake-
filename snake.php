@@ -2,6 +2,7 @@
 <html>
 
 <head>
+     <?php include("../webAnalytics.php"); ?>
     <meta charset="utf-8" />
     <title> Snake Game</title>
     <style>
@@ -22,6 +23,13 @@
 
 <body>
     <canvas id="myCanvas" width="686" height="588"></canvas>
+    
+    <div class="lastEdit">
+    <?php
+        echo "Last Modified: ".date("F d Y H:i:s.",filemtime("index.php"));
+        
+        ?>
+    </div>
 
     <script>
         //To render things on canvas we need a reference to it
