@@ -75,25 +75,20 @@
         
         pickFoodLocation();
 
-
+        var gameState = 1; 
         //GAME LOOP 
         function gameLoop() {
             //Will do stuff
             //Clear canvas 
+            if(gameState) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            //Canvas is clear
-            //So ERASE SNAKE -> MOVE SNAKE -> DRAW SNAKE 
-            //WHEN MOVE FIRST BIT OF SNAKE GETS NEW COORDS OTHER BITS
-            //JUST GET MOVED UP 
-            //SO SECOND BLOCK GETS FIRST BLOCKS COORDS, ETC 
-
-            //MOVE SNAKE
             moveSnake();
-          
-            
             drawSnake();
             snakeEat();
             drawFood();
+            } else {
+                //Game is PAUSED
+            }
              
 
         }
@@ -211,6 +206,12 @@
                 snake.xspeed = -1;
                 snake.yspeed = 0;
 
+            } else if (e.keyCode == 80) {
+                if(gameState) {
+                    gameState = 0; 
+                } else {
+                    gameState = 1;
+                }
             }
 
         }
