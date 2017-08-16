@@ -112,7 +112,10 @@
                 drawSnake();
                 snakeEat();
                 drawFood();
+<<<<<<< HEAD
                 drawScore();
+=======
+>>>>>>> 061bd4f4f7bbff507061ad5c3ecfc0408d844490
             } else if (gameState == 0) {
                 //Game is PAUSED
             } else if (gameState == 2) {
@@ -154,6 +157,7 @@
             }
 
         }
+<<<<<<< HEAD
         
         function drawScore() {
             //Draws score. 
@@ -162,6 +166,8 @@
             ctx.font = "16px Arial";
             ctx.fillText("Score: " + (snake.length - 1), 10, 20);
         }
+=======
+>>>>>>> 061bd4f4f7bbff507061ad5c3ecfc0408d844490
 
 
 
@@ -206,6 +212,7 @@
                 shiftArray();
                 console.log("SNAKE MOVE, X: " + snake.x + " Y: " + snake.y);
             }
+<<<<<<< HEAD
             
             //Check if snake is touching itself. 
             for(i = 1; i< snake.length; i++) {
@@ -215,6 +222,8 @@
                     snake.length -= 1;
                 }
             }
+=======
+>>>>>>> 061bd4f4f7bbff507061ad5c3ecfc0408d844490
             //After Array updated check if snake has hit itself.
 
             //IF SNAKE MOVES CHECK IF IT IS TOUCHING FOOD 
@@ -271,12 +280,18 @@
                 snake.yspeed = -1;
             } else if (e.keyCode == 68 || e.keyCode == 39) {
                 //RIGHT 
+<<<<<<< HEAD
                 if(snake.xspeed != -1)
                     {
                 snake.xspeed = 1;
                 snake.yspeed = 0;
                     }
                         
+=======
+                snake.xspeed = 1;
+                snake.yspeed = 0;
+
+>>>>>>> 061bd4f4f7bbff507061ad5c3ecfc0408d844490
             } else if (e.keyCode == 83 || e.keyCode == 40) {
                 //DOWN
                 snake.xspeed = 0;
@@ -284,12 +299,18 @@
 
             } else if (e.keyCode == 65 || e.keyCode == 37) {
                 //LEFT
+<<<<<<< HEAD
                 if(snake.xspeed!= 1)
                     {
                 snake.xspeed = -1;
                 snake.yspeed = 0;
                     }
                         
+=======
+                snake.xspeed = -1;
+                snake.yspeed = 0;
+
+>>>>>>> 061bd4f4f7bbff507061ad5c3ecfc0408d844490
             } else if (e.keyCode == 80) {
                 if (gameState) {
                     gameState = 0;
