@@ -55,6 +55,7 @@
         var ctx = canvas.getContext("2d");
         //Lets us render 2d stuff I think 
         //Stuff for food. 
+
         var foodArray = [];
         var gameState = 1;
         var mousex;
@@ -74,6 +75,7 @@
             [snake.x, snake.y]
         ];
 
+
         function makeFood() {
             if (foodArray.length < 2) {
                 food = new Food();
@@ -81,9 +83,6 @@
                 foodArray.push(food);
             }
         }
-
-
-
         //GAME LOOP 
         function gameLoop() {
             //Game States: 0 - paused, 1 - normal, 2 - game over
@@ -331,7 +330,7 @@
 
         function mouseClickHandler(e) {
             if (resButton == true) {
-                console.log("Resetting");
+
                 //Then restart game. 
                 gameState = 1;
                 snake = {
@@ -345,8 +344,8 @@
                 tail = [
                     [snake.x, snake.y]
                 ];
+
                 resButton = false;
-                pickFoodLocation();
             }
         }
 
@@ -360,7 +359,7 @@
             } else {
                 resButton = false;
             }
-            console.log("after func inres is: " + resButton);
+
         }
 
     </script>
