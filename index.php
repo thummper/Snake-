@@ -56,6 +56,9 @@
         //Stuff for food. 
         var foodx;
         var foody;
+        var mousex;
+        var mousey;
+        var resButton = false;
         //Snake object.
         var snake = {
             scale: 14,
@@ -79,7 +82,7 @@
         //Pick first food location.
         pickFoodLocation();
         var gameState = 1;
-        
+
         //GAME LOOP 
         function gameLoop() {
             //Game States: 0 - paused, 1 - normal, 2 - game over
@@ -99,9 +102,9 @@
                 drawGameOver();
             }
         }
-        
+
         setInterval(gameLoop, 100);
-        
+
         function drawGameOver() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.beginPath();
@@ -109,9 +112,20 @@
             //Box for GameOver text. 
             ctx.fillRect(canvas.width / 2 - 150, canvas.height / 2 - 50, 300, 50);
             ctx.fill();
-            //Box for restart button.
-            ctx.fillRect(canvas.width / 2 - 75, canvas.height / 2 + 20, 150, 30);
-            ctx.fill();
+
+            if (resButton) {
+                //Make button change.
+                ctx.fillStyle = "yellow";
+                ctx.fillRect(canvas.width / 2 - 75, canvas.height / 2 + 20, 150, 30);
+                ctx.fill();
+
+            } else {
+                //Normal button.
+                //Box for restart button.
+                ctx.fillStyle = "black";
+                ctx.fillRect(canvas.width / 2 - 75, canvas.height / 2 + 20, 150, 30);
+                ctx.fill();
+            }
 
             //All text stuff here.
             ctx.beginPath();
@@ -245,6 +259,8 @@
 
 
         document.addEventListener("keydown", eventHandler, false);
+        document.getElementById("myCanvas").addEventListener("mousemove", mouseMoveHandler, false);
+        document.getElementById("myCanvas").addEventListener("mousedown", mouseClickHandler, false);
 
         function eventHandler(e) {
             if (e.keyCode == 87 || e.keyCode == 38) {
@@ -287,6 +303,50 @@
                 }
             }
 
+        }
+
+        function mouseMoveHandler(evt) {
+            if (gameState == 2) {
+                //Game is over, watch for mouse to enter button. 
+                var rect = canvas.getBoundingClientRect();
+                mousex = Math.round((evt.clientX - rect.left) / (rect.right - rect.left) * canvas.width);
+                mousey = Math.round((evt.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height);
+                inResButton(mousex, mousey);
+
+
+                console.log("Mouse x,y : " + mousex + " , " + mousey);
+            }
+        }
+
+        function mouseClickHandler(e) {
+            if (resButton == true) {
+                //Then restart game. 
+                gameState = 1;
+                snake = {
+                    scale: 14,
+                    xspeed: 1,
+                    yspeed: 0,
+                    length: 1,
+                    x: 350,
+                    y: 294
+                }
+                tail = [
+                    [snake.x, snake.y]
+                ];
+                pickFoodLocation();
+            }
+        }
+
+        function inResButton(x, y) {
+            console.log("Resbutton");
+            //Check if coords inside restart button. 
+            var width = canvas.width;
+            var height = canvas.height;
+            if ((x > width / 2 - 75) && (x < width / 2 - 75 + 150) && (y > height / 2 + 20) && (y < height / 2 + 50)) {
+                resButton = true;
+            } else {
+                resButton = false;
+            }
         }
 
     </script>
