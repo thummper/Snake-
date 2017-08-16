@@ -38,10 +38,7 @@
 
 <body>
     <div class="lastEdit">
-        <?php
-        echo "Last Modified (GMT): ".date("F d Y H:i:s.", (getlastmod() + 18000));
-        
-        ?>
+        <?php echo "Last Modified (GMT): ".date("F d Y H:i:s.", (getlastmod() + 18000));?>
     </div>
 
     <div class="controls">
@@ -51,42 +48,15 @@
 
     </div>
     <canvas id="myCanvas" width="686" height="588"></canvas>
-
-
-
-
     <script>
         //To render things on canvas we need a reference to it
         var canvas = document.getElementById("myCanvas");
         var ctx = canvas.getContext("2d");
         //Lets us render 2d stuff I think 
+        //Stuff for food. 
         var foodx;
         var foody;
-
-        function pickFoodLocation() {
-            var rows = canvas.width / snake.scale;
-            var cols = canvas.height / snake.scale;
-
-
-
-            //RANDOM COLUMN
-            foodx = Math.round(Math.random() * 48) * 14;
-            foody = Math.round(Math.random() * 41) * 14;
-
-
-
-
-
-
-
-
-        }
-
-
-
-
-        //DRAW SNAKE
-
+        //Snake object.
         var snake = {
             scale: 14,
             xspeed: 1,
@@ -95,16 +65,24 @@
             x: 350,
             y: 294
         }
+        //Tail array. 
         var tail = [
             [snake.x, snake.y]
         ];
 
+        function pickFoodLocation() {
+            var rows = canvas.width / snake.scale;
+            var cols = canvas.height / snake.scale;
+            foodx = Math.round(Math.random() * 48) * 14;
+            foody = Math.round(Math.random() * 41) * 14;
+        }
+        //Pick first food location.
         pickFoodLocation();
-
         var gameState = 1;
+        
         //GAME LOOP 
         function gameLoop() {
-            //Will do stuff
+            //Game States: 0 - paused, 1 - normal, 2 - game over
             //Clear canvas 
             if (gameState == 1) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -120,29 +98,28 @@
                 //GAMEOVER
                 drawGameOver();
             }
-
-
         }
+        
         setInterval(gameLoop, 100);
-
+        
         function drawGameOver() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.beginPath();
             ctx.fillStyle = "black";
+            //Box for GameOver text. 
             ctx.fillRect(canvas.width / 2 - 150, canvas.height / 2 - 50, 300, 50);
             ctx.fill();
-
+            //Box for restart button.
             ctx.fillRect(canvas.width / 2 - 75, canvas.height / 2 + 20, 150, 30);
             ctx.fill();
 
-
+            //All text stuff here.
             ctx.beginPath();
             ctx.font = "30px arial";
             ctx.fillStyle = "red";
             ctx.fillText("Game Over", canvas.width / 2 - 70, canvas.height / 2 - 12);
             ctx.font = "16px arial";
             ctx.fillText("Restart?", canvas.width / 2 - 28, canvas.height / 2 + 40);
-
-
         }
 
         function snakeEat() {
