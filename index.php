@@ -112,10 +112,8 @@
                 drawSnake();
                 snakeEat();
                 drawFood();
-<<<<<<< HEAD
                 drawScore();
-=======
->>>>>>> 061bd4f4f7bbff507061ad5c3ecfc0408d844490
+
             } else if (gameState == 0) {
                 //Game is PAUSED
             } else if (gameState == 2) {
@@ -132,19 +130,19 @@
             ctx.fillStyle = "black";
             ctx.fillRect(canvas.width / 2 - 150, canvas.height / 2 - 50, 300, 50);
             ctx.fill();
-            
-            ctx.fillRect(canvas.width/2 - 75, canvas.height/2 + 20, 150, 30);
+
+            ctx.fillRect(canvas.width / 2 - 75, canvas.height / 2 + 20, 150, 30);
             ctx.fill();
-            
-            
+
+
             ctx.beginPath();
             ctx.font = "30px arial";
             ctx.fillStyle = "red";
-            ctx.fillText("Game Over", canvas.width/2 - 70, canvas.height/2 - 12);
+            ctx.fillText("Game Over", canvas.width / 2 - 70, canvas.height / 2 - 12);
             ctx.font = "16px arial";
-            ctx.fillText("Restart?", canvas.width/2 - 28, canvas.height/2 + 40);
-            
-            
+            ctx.fillText("Restart?", canvas.width / 2 - 28, canvas.height / 2 + 40);
+
+
         }
 
         function snakeEat() {
@@ -157,8 +155,8 @@
             }
 
         }
-<<<<<<< HEAD
-        
+
+
         function drawScore() {
             //Draws score. 
             ctx.beginPath();
@@ -166,8 +164,7 @@
             ctx.font = "16px Arial";
             ctx.fillText("Score: " + (snake.length - 1), 10, 20);
         }
-=======
->>>>>>> 061bd4f4f7bbff507061ad5c3ecfc0408d844490
+
 
 
 
@@ -212,18 +209,17 @@
                 shiftArray();
                 console.log("SNAKE MOVE, X: " + snake.x + " Y: " + snake.y);
             }
-<<<<<<< HEAD
-            
+
+
             //Check if snake is touching itself. 
-            for(i = 1; i< snake.length; i++) {
-                if(snake.x == tail[i][0] && snake.y == tail[i][1]) {
+            for (i = 1; i < snake.length; i++) {
+                if (snake.x == tail[i][0] && snake.y == tail[i][1]) {
                     //Snake is touching itself - Lose Score??
                     console.log("Touched Self.");
                     snake.length -= 1;
                 }
             }
-=======
->>>>>>> 061bd4f4f7bbff507061ad5c3ecfc0408d844490
+
             //After Array updated check if snake has hit itself.
 
             //IF SNAKE MOVES CHECK IF IT IS TOUCHING FOOD 
@@ -280,18 +276,17 @@
                 snake.yspeed = -1;
             } else if (e.keyCode == 68 || e.keyCode == 39) {
                 //RIGHT 
-<<<<<<< HEAD
-                if(snake.xspeed != -1)
-                    {
-                snake.xspeed = 1;
-                snake.yspeed = 0;
-                    }
-                        
-=======
+
+                if (snake.xspeed != -1) {
+                    snake.xspeed = 1;
+                    snake.yspeed = 0;
+                }
+
+
                 snake.xspeed = 1;
                 snake.yspeed = 0;
 
->>>>>>> 061bd4f4f7bbff507061ad5c3ecfc0408d844490
+
             } else if (e.keyCode == 83 || e.keyCode == 40) {
                 //DOWN
                 snake.xspeed = 0;
@@ -299,18 +294,14 @@
 
             } else if (e.keyCode == 65 || e.keyCode == 37) {
                 //LEFT
-<<<<<<< HEAD
-                if(snake.xspeed!= 1)
-                    {
-                snake.xspeed = -1;
-                snake.yspeed = 0;
-                    }
-                        
-=======
-                snake.xspeed = -1;
-                snake.yspeed = 0;
 
->>>>>>> 061bd4f4f7bbff507061ad5c3ecfc0408d844490
+                if (snake.xspeed != 1) {
+                    snake.xspeed = -1;
+                    snake.yspeed = 0;
+                }
+
+                snake.xspeed = -1;
+                snake.yspeed = 0;
             } else if (e.keyCode == 80) {
                 if (gameState) {
                     gameState = 0;
