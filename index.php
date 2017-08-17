@@ -241,12 +241,56 @@
 
         function drawSnake() {
             for (i = 0; i < snake.length; i++) {
+                
+                if(i == 0) {
+                    //drawing head
+                    //UP
+                    ctx.beginPath();
+                    ctx.fillStyle = "black";
+                    ctx.rect(tail[i][0], tail[i][1], snake.scale, snake.scale);
+                    ctx.fill();
+                    
+                    
+                    
+                    
+                    
+                    if(snake.yspeed == -1) {
+                        //eyes facing up
+                        ctx.fillStyle = "white";
+                        ctx.fillRect(tail[i][0] + 3, tail[i][1] + 1, 2, 3);
+                        ctx.fillRect(tail[i][0] + 9, tail[i][1] + 1, 2, 3);
+                        
+                    }
+                    else if(snake.yspeed == 1) {
+                        //eyes down
+                        ctx.fillStyle = "white";
+                        ctx.fillRect(tail[i][0] + 3, tail[i][1] + 10, 2, 3);
+                        ctx.fillRect(tail[i][0] + 9, tail[i][1] + 10, 2, 3);
+                    }
+                    else if(snake.xspeed == -1) {
+                        //eyes left
+                        ctx.fillStyle = "white";
+                        ctx.fillRect(tail[i][0] + 1, tail[i][1] + 3, 3, 2);
+                        ctx.fillRect(tail[i][0] + 1, tail[i][1] + 9, 3, 2);
+                    }
+                    else if(snake.xspeed == 1) {
+                        //eyes right
+                        ctx.fillStyle = "white";
+                        ctx.fillRect(tail[i][0] + 10, tail[i][1] + 3, 3, 2);
+                        ctx.fillRect(tail[i][0] + 10, tail[i][1] + 9, 3, 2);
+                    }
+                    ctx.closePath();
+                } else {
+                    
+                    
+                
 
                 ctx.beginPath();
                 ctx.rect(tail[i][0], tail[i][1], snake.scale, snake.scale);
                 ctx.fillStyle = "black";
                 ctx.fill();
                 ctx.closePath();
+                }
 
             }
 
@@ -273,23 +317,17 @@
         document.getElementById("myCanvas").addEventListener("mousedown", mouseClickHandler, false);
 
         function eventHandler(e) {
+            e.preventDefault();
             if (e.keyCode == 87 || e.keyCode == 38) {
                 //UP
                 snake.xspeed = 0;
                 snake.yspeed = -1;
             } else if (e.keyCode == 68 || e.keyCode == 39) {
                 //RIGHT 
-
                 if (snake.xspeed != -1) {
                     snake.xspeed = 1;
                     snake.yspeed = 0;
                 }
-
-
-                snake.xspeed = 1;
-                snake.yspeed = 0;
-
-
             } else if (e.keyCode == 83 || e.keyCode == 40) {
                 //DOWN
                 snake.xspeed = 0;
@@ -297,14 +335,10 @@
 
             } else if (e.keyCode == 65 || e.keyCode == 37) {
                 //LEFT
-
                 if (snake.xspeed != 1) {
                     snake.xspeed = -1;
                     snake.yspeed = 0;
                 }
-
-                snake.xspeed = -1;
-                snake.yspeed = 0;
             } else if (e.keyCode == 80) {
                 if (gameState) {
                     gameState = 0;
