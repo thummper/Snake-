@@ -5,6 +5,8 @@
     <?php include("../webAnalytics.php"); ?>
     <meta charset="utf-8" />
     <title> Snake Game</title>
+    <meta name="description" content="A simple JS snake game." />
+    <meta name="author" content="Aron" />
     <style>
         * {
             padding: 0;
@@ -89,11 +91,16 @@
             //Clear canvas 
             if (gameState == 1) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                makeFood();
+                drawFood();
                 moveSnake();
                 drawSnake();
+                
                 snakeEat();
-                drawFood();
+                makeFood();
+                
+               
+                
+                
                 drawScore();
 
             } else if (gameState == 0) {
@@ -170,7 +177,7 @@
 
             if ((snake.x + snake.xspeed * snake.scale) > (canvas.width - 14) || (snake.x + snake.xspeed * snake.scale) < 0) {
                 //Dont Move - Hit wall
-                console.log("HitWall");
+                //////console.log("HitWall");
                 gameState = 2;
 
             } else {
@@ -185,7 +192,7 @@
 
             if ((snake.y + snake.yspeed * snake.scale) < 0 || (snake.y + snake.yspeed * snake.scale) > (canvas.height - 14)) {
                 //Dont Move - Hit wall
-                console.log("HitWall");
+                ////console.log("HitWall");
                 gameState = 2;
 
             } else {
@@ -203,7 +210,7 @@
 
             if (move) {
                 shiftArray();
-                console.log("SNAKE MOVE, X: " + snake.x + " Y: " + snake.y);
+                ////console.log("SNAKE MOVE, X: " + snake.x + " Y: " + snake.y);
             }
 
 
@@ -211,7 +218,7 @@
             for (i = 1; i < snake.length; i++) {
                 if (snake.x == tail[i][0] && snake.y == tail[i][1]) {
                     //Snake is touching itself - Lose Score??
-                    console.log("Touched Self.");
+                    ////console.log("Touched Self.");
                     snake.length -= 1;
                 }
             }
@@ -233,8 +240,8 @@
             tail[0] = [snake.x, snake.y];
 
             if (snake.length > 1) {
-                console.log("Current Pos: " + tail[0]);
-                console.log("ind 1 pos: " + tail[1])
+                //console.log("Current Pos: " + tail[0]);
+                //console.log("ind 1 pos: " + tail[1])
             }
 
         }
@@ -320,8 +327,11 @@
             e.preventDefault();
             if (e.keyCode == 87 || e.keyCode == 38) {
                 //UP
+                if(snake.yspeed != 1)
+                    {
                 snake.xspeed = 0;
                 snake.yspeed = -1;
+                    }
             } else if (e.keyCode == 68 || e.keyCode == 39) {
                 //RIGHT 
                 if (snake.xspeed != -1) {
@@ -330,9 +340,12 @@
                 }
             } else if (e.keyCode == 83 || e.keyCode == 40) {
                 //DOWN
+                if(snake.yspeed != -1)
+                    {
                 snake.xspeed = 0;
                 snake.yspeed = 1;
-
+                    }
+                        
             } else if (e.keyCode == 65 || e.keyCode == 37) {
                 //LEFT
                 if (snake.xspeed != 1) {
@@ -358,7 +371,7 @@
                 inResButton(mousex, mousey);
 
 
-                console.log("Mouse x,y : " + mousex + " , " + mousey);
+                //console.log("Mouse x,y : " + mousex + " , " + mousey);
             }
         }
 
@@ -384,7 +397,7 @@
         }
 
         function inResButton(x, y) {
-            console.log("Resbutton");
+            //console.log("Resbutton");
             //Check if coords inside restart button. 
             var width = canvas.width;
             var height = canvas.height;
