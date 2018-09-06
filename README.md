@@ -1,3 +1,3 @@
 # Snake-
 Simple JS Snake game. 
-Live here: http://thummper.net/Projects/Games/Snake/index.php
+Live [here](http://thummper.net/Projects/Games/Snake/index.php)
