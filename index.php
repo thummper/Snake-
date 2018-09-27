@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <?php include("../webAnalytics.php"); ?>
+    <?php include("../../../webAnalytics.php"); ?>
     <meta charset="utf-8" />
     <title> Snake Game</title>
     <meta name="description" content="A simple JS snake game." />
@@ -48,70 +48,253 @@
         Movement:
         <br> WASD OR Arrow Keys.
         <br> Press "P" to pause.
+		<br> Press "R" to reset.
 
     </div>
     <canvas id="myCanvas" width="686" height="588"></canvas>
     <script>
-        //To render things on canvas we need a reference to it
-        var canvas = document.getElementById("myCanvas");
-        var ctx = canvas.getContext("2d");
-        //Lets us render 2d stuff I think 
-        //Stuff for food. 
+		class Game{
+			constructor(canvas){
+				this.canvas = canvas;
+				this.ctx = canvas.getContext('2d');
+				//Game vars
+				this.movex = 0;
+				this.movey = 0;
+				this.foodArray = [];
+				this.gameState = 1;
+				this.mousex;
+				this.mousey;
+				this.move = 0;
+				this.resButtons = false;
+				this.snake = {
+					scale: 14,
+					xspeed: 1,
+					yspeed: 0, 
+					length: 1,
+					x: 350,
+					y: 294
+				};
+				this.tail = [
+					[this.snake.x, this.snake.y]
+				];
+				this.gameLoop;
+			}
+			init(){
+				//Set everything up
+				this.addListeners();
+				this.makeFood();
+				this.gameLoop = window.setInterval(this.loop.bind(this), 150);
+				
+			}
+			addListeners(){
+				document.addEventListener('keydown', function(e){
+					let kc = e.keyCode;
+					if(kc == 87 || kc == 38){
+						//Up
+						if(this.snake.yspeed != 1){
+							//Not going down.
+							this.snake.yspeed = -1;
+							this.snake.xspeed = 0;
+						}
+					} else if(kc == 68 || kc == 39){
+						//Right
+						if(this.snake.xspeed != -1){
+							this.snake.xspeed = 1;
+							this.snake.yspeed = 0;
+						}
+						
+					} else if(kc == 83 || kc == 40){
+						//Down
+						if(this.snake.yspeed != -1){
+							this.snake.yspeed = 1;
+							this.snake.xspeed = 0;
+						}
+					} else if(kc == 65 || kc == 37){
+						//Left
+						if(this.snake.xspeed != 1){
+							this.snake.xspeed = -1;
+							this.snake.yspeed = 0;
+						}
+					} else if(kc == 80){
+						if(this.gameState != 0){
+							this.gameState = 0;
+						} else {
+							this.gameState = 1;
+						}
+					} else if(kc == 82){
+						//Reset
+						this.reset();
+					}
+					
+				}.bind(this));
+				this.canvas.addEventListener('mousemove', function(e){
+					console.log("Mouse X/Y: ", e.offsetX, e.offsetY);
+				}.bind(this));
+				this.canvas.addEventListener('click', function(e){
+					console.log("Clicked at: ", e.offsetX, e.offsetY);
+				}.bind(this));
+			}
+			
+			reset(){
+				//Reset game.
+				this.movex = 0;
+				this.movey = 0;
+				this.foodArray = [];
+				this.gameState = 1;
+				this.mousex;
+				this.mousey;
+				this.move = 0;
+				this.resButtons = false;
+				this.snake = {
+					scale: 14,
+					xspeed: 1,
+					yspeed: 0, 
+					length: 1,
+					x: 350,
+					y: 294
+				};
+				this.tail = [
+					[this.snake.x, this.snake.y]
+				];
+			}
+			//Makes x pieces of food
+			makeFood(){
+				let food = new Food();
+				food.pickLocation();
+				this.foodArray.push(food);
+			}
+			loop(){
+				//Game states: 0 = paused, 1 = normal, 2 = gameover
+				if(this.gameState == 1){
+					if(this.foodArray.length <= (this.snake.length + 1) / 2){
+						this.makeFood();
+					}
+					//Do normal game things
+					this.clearScreen();
+					this.snakeEat();
+					this.drawFood();
+					this.drawSnake();
+					this.moveSnake();
+				} else if(this.gameState == 0){
+					//Do paused things
+				} else if(this.gameState == 2){
+					//Do gameover things
+				}
+				
 
-        var foodArray = [];
-        var gameState = 1;
-        var mousex;
-        var mousey;
-        var resButton = false;
-        //Snake object.
-        var snake = {
-            scale: 14,
-            xspeed: 1,
-            yspeed: 0,
-            length: 1,
-            x: 350,
-            y: 294
-        }
-        //Tail array. 
-        var tail = [
-            [snake.x, snake.y]
-        ];
+			}
+			clearScreen(){
+				this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+			}
+			snakeEat(){
+				//Handles collision for food, increases snake length and deletes old food.
+				for(let i = 0, j = this.tail.length; i < j; i++){
+					let block = this.tail[i];
+					let x = block[0];
+					let y = block[1];
+					let len = this.foodArray.length - 1;
+					for(let a = len; a >= 0; a--){
+						let food = this.foodArray[a];
+						if(food.x == x && food.y == y){
+							this.snake.length++;
+							this.foodArray.splice(a, 1);
+						}
+					}	
+				}
+			}
+			drawFood(){	
+				for(let i = 0, j = this.foodArray.length; i < j; i++){
+					let food = this.foodArray[i];
+					this.drawRect(food.x, food.y, 'red', this.snake.scale);
+				}
+			}
+			drawSnake(){
+				let snake = this.snake;
+				let tail = this.tail;
+				for(let i = 0; i < snake.length; i++){
+					let x = tail[i][0];
+					let y = tail[i][1];
+					if(i == 0){
+						this.drawRect(x, y, "black", snake.scale);
+						let direction = this.snakeDir();
+						if(direction == "U"){
+							//Eyes facing up.
+							this.drawRect(x + 3, y + 1, 'white', 2);
+							this.drawRect(x + 9, y + 1, 'white', 2);
+						} else if(direction == "D"){
+							//Eyes facing down
+							this.drawRect(x + 3, y + 10, 'white', 2);
+							this.drawRect(x + 9, y + 10, 'white', 2);
+						} else if(direction == "L"){
+							//Eyes facing left
+							this.drawRect(x + 1, y + 3, 'white', 2);
+							this.drawRect(x + 1, y + 9, 'white', 2);
+						} else if(direction == "R"){
+							this.drawRect(x + 10, y + 3, 'white', 2);
+							this.drawRect(x + 10, y + 9, 'white', 2);
+						}
+					} else {
+						this.drawRect(x, y, 'black', snake.scale);
+					}
+				}	
+			}
+			drawRect(x, y, col, size){
+				this.ctx.beginPath();
+				this.ctx.fillStyle = col;
+				this.ctx.rect(x, y, size, size);
+				this.ctx.fill();
+				this.ctx.closePath();
+			}
+			snakeDir(){
+				let dir = null;
+				if(this.snake.yspeed == -1){
+					//Snake is going update
+					return "U";
+				}
+				if(this.snake.yspeed == 1){
+					//Snake is going down 
+					return "D";
+				}
+				if(this.snake.xspeed == 1){
+					//Snake is going right
+					return "R";
+				}
+				if(this.snake.xspeed == -1){
+					//Snake is going left
+					return "L";
+				}
+			}
+			moveSnake(){
+				let snake = this.snake;
+				if((snake.x + (snake.xspeed * snake.scale)) > this.canvas.width - 14 || (snake.x + (snake.xspeed * snake.scale ))< 0){
+				   //Hit a wall.
+				   console.log("Hit left or right");
+				   this.gameState = 2;
+				   } else if(snake.y + (snake.yspeed * snake.scale) < 0 || snake.y + (snake.yspeed * snake.scale) > this.canvas.height - 14){
+					   //Hit a wall
+					   this.gameState = 2;
+					   console.log("Hit top or bottom");
+				   } else {
+					   //Didn't hit a wall.
+					   snake.x += snake.xspeed * snake.scale;
+					   snake.y += snake.yspeed * snake.scale;
+					   this.shiftSnake();
+				   }
+			}
+			shiftSnake(){
+				//Move all values in the tail array by one
+				this.tail.unshift([this.snake.x, this.snake.y]);
+				
+			}
+		}
+		
+		window.addEventListener("load", function(e){
+			console.log("Making game");
+			let game = new Game(document.getElementById('myCanvas'));
+			game.init();
+		});
 
-
-        function makeFood() {
-            if (foodArray.length < 2) {
-                food = new Food();
-                food.pickLocation();
-                foodArray.push(food);
-            }
-        }
-        //GAME LOOP 
-        function gameLoop() {
-            //Game States: 0 - paused, 1 - normal, 2 - game over
-            //Clear canvas 
-            if (gameState == 1) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                drawFood();
-                moveSnake();
-                drawSnake();
-                
-                snakeEat();
-                makeFood();
-                
-               
-                
-                
-                drawScore();
-
-            } else if (gameState == 0) {
-                //Game is PAUSED
-            } else if (gameState == 2) {
-                //GAMEOVER
-                drawGameOver();
-            }
-        }
-
-        setInterval(gameLoop, 100);
+		
 
         function drawGameOver() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -143,23 +326,6 @@
             ctx.font = "16px arial";
             ctx.fillText("Restart?", canvas.width / 2 - 28, canvas.height / 2 + 40);
         }
-
-        function snakeEat() {
-            for (i in tail) {
-                for (j in foodArray) {
-                    if (tail[i][0] == foodArray[j].x && tail[i][1] == foodArray[j].y) {
-                        foodArray.splice(j, 1);
-                        snake.length++;
-                    }
-
-
-                }
-
-            }
-
-        }
-
-
         function drawScore() {
             //Draws score. 
             ctx.beginPath();
@@ -169,245 +335,63 @@
         }
 
 
+//            //Check if snake is touching itself. 
+//            for (i = 1; i < snake.length; i++) {
+//                if (snake.x == tail[i][0] && snake.y == tail[i][1]) {
+//                    //Snake is touching itself - Lose Score??
+//                    console.log("Touched Self.");
+//                    snake.length -= 1;
+//                }
+//            }
 
 
 
-        function moveSnake() {
-            var move = false;
-
-            if ((snake.x + snake.xspeed * snake.scale) > (canvas.width - 14) || (snake.x + snake.xspeed * snake.scale) < 0) {
-                //Dont Move - Hit wall
-                //////console.log("HitWall");
-                gameState = 2;
-
-            } else {
-                snake.x += snake.xspeed * snake.scale;
-                if ((snake.xspeed * snake.scale) != 0) {
-                    move = true;
-                }
-
-
-
-            }
-
-            if ((snake.y + snake.yspeed * snake.scale) < 0 || (snake.y + snake.yspeed * snake.scale) > (canvas.height - 14)) {
-                //Dont Move - Hit wall
-                ////console.log("HitWall");
-                gameState = 2;
-
-            } else {
-                snake.y += snake.yspeed * snake.scale;
-                if ((snake.yspeed * snake.scale) != 0) {
-                    move = true;
-                }
-
-
-
-            }
-
-
-
-
-            if (move) {
-                shiftArray();
-                ////console.log("SNAKE MOVE, X: " + snake.x + " Y: " + snake.y);
-            }
-
-
-            //Check if snake is touching itself. 
-            for (i = 1; i < snake.length; i++) {
-                if (snake.x == tail[i][0] && snake.y == tail[i][1]) {
-                    //Snake is touching itself - Lose Score??
-                    ////console.log("Touched Self.");
-                    snake.length -= 1;
-                }
-            }
-
-            //After Array updated check if snake has hit itself.
-
-            //IF SNAKE MOVES CHECK IF IT IS TOUCHING FOOD 
-            //IF FOOD EATEN PICK NO CO-ORDS 
-        }
-
-        function shiftArray() {
-            //This function fires after the snake MOVES 
-            //First will will move all values along the array by 1 
-            for (i = snake.length - 1; i > 0; i--) {
-                tail[i] = tail[i - 1];
-            }
-            //Array shifted so last snake pos is at ind 1 in the array 
-            //Add current location to head
-            tail[0] = [snake.x, snake.y];
-
-            if (snake.length > 1) {
-                //console.log("Current Pos: " + tail[0]);
-                //console.log("ind 1 pos: " + tail[1])
-            }
-
-        }
-
-        function drawSnake() {
-            for (i = 0; i < snake.length; i++) {
-                
-                if(i == 0) {
-                    //drawing head
-                    //UP
-                    ctx.beginPath();
-                    ctx.fillStyle = "black";
-                    ctx.rect(tail[i][0], tail[i][1], snake.scale, snake.scale);
-                    ctx.fill();
-                    
-                    
-                    
-                    
-                    
-                    if(snake.yspeed == -1) {
-                        //eyes facing up
-                        ctx.fillStyle = "white";
-                        ctx.fillRect(tail[i][0] + 3, tail[i][1] + 1, 2, 3);
-                        ctx.fillRect(tail[i][0] + 9, tail[i][1] + 1, 2, 3);
-                        
-                    }
-                    else if(snake.yspeed == 1) {
-                        //eyes down
-                        ctx.fillStyle = "white";
-                        ctx.fillRect(tail[i][0] + 3, tail[i][1] + 10, 2, 3);
-                        ctx.fillRect(tail[i][0] + 9, tail[i][1] + 10, 2, 3);
-                    }
-                    else if(snake.xspeed == -1) {
-                        //eyes left
-                        ctx.fillStyle = "white";
-                        ctx.fillRect(tail[i][0] + 1, tail[i][1] + 3, 3, 2);
-                        ctx.fillRect(tail[i][0] + 1, tail[i][1] + 9, 3, 2);
-                    }
-                    else if(snake.xspeed == 1) {
-                        //eyes right
-                        ctx.fillStyle = "white";
-                        ctx.fillRect(tail[i][0] + 10, tail[i][1] + 3, 3, 2);
-                        ctx.fillRect(tail[i][0] + 10, tail[i][1] + 9, 3, 2);
-                    }
-                    ctx.closePath();
-                } else {
-                    
-                    
-                
-
-                ctx.beginPath();
-                ctx.rect(tail[i][0], tail[i][1], snake.scale, snake.scale);
-                ctx.fillStyle = "black";
-                ctx.fill();
-                ctx.closePath();
-                }
-
-            }
-
-
-        }
-
-        function drawFood() {
-
-            for (i in foodArray) {
-                ctx.beginPath();
-                ctx.rect(foodArray[i].x, foodArray[i].y, snake.scale, snake.scale);
-                ctx.fillStyle = "red";
-                ctx.fill();
-                ctx.closePath();
-
-            }
-
-
-        }
-
-
-        document.addEventListener("keydown", eventHandler, false);
-        document.getElementById("myCanvas").addEventListener("mousemove", mouseMoveHandler, false);
-        document.getElementById("myCanvas").addEventListener("mousedown", mouseClickHandler, false);
-
-        function eventHandler(e) {
-            e.preventDefault();
-            if (e.keyCode == 87 || e.keyCode == 38) {
-                //UP
-                if(snake.yspeed != 1)
-                    {
-                snake.xspeed = 0;
-                snake.yspeed = -1;
-                    }
-            } else if (e.keyCode == 68 || e.keyCode == 39) {
-                //RIGHT 
-                if (snake.xspeed != -1) {
-                    snake.xspeed = 1;
-                    snake.yspeed = 0;
-                }
-            } else if (e.keyCode == 83 || e.keyCode == 40) {
-                //DOWN
-                if(snake.yspeed != -1)
-                    {
-                snake.xspeed = 0;
-                snake.yspeed = 1;
-                    }
-                        
-            } else if (e.keyCode == 65 || e.keyCode == 37) {
-                //LEFT
-                if (snake.xspeed != 1) {
-                    snake.xspeed = -1;
-                    snake.yspeed = 0;
-                }
-            } else if (e.keyCode == 80) {
-                if (gameState) {
-                    gameState = 0;
-                } else {
-                    gameState = 1;
-                }
-            }
-
-        }
-
-        function mouseMoveHandler(evt) {
-            if (gameState == 2) {
-                //Game is over, watch for mouse to enter button. 
-                var rect = canvas.getBoundingClientRect();
-                mousex = Math.round((evt.clientX - rect.left) / (rect.right - rect.left) * canvas.width);
-                mousey = Math.round((evt.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height);
-                inResButton(mousex, mousey);
-
-
-                //console.log("Mouse x,y : " + mousex + " , " + mousey);
-            }
-        }
-
-        function mouseClickHandler(e) {
-            if (resButton == true) {
-
-                //Then restart game. 
-                gameState = 1;
-                snake = {
-                    scale: 14,
-                    xspeed: 1,
-                    yspeed: 0,
-                    length: 1,
-                    x: 350,
-                    y: 294
-                }
-                tail = [
-                    [snake.x, snake.y]
-                ];
-
-                resButton = false;
-            }
-        }
-
-        function inResButton(x, y) {
-            //console.log("Resbutton");
-            //Check if coords inside restart button. 
-            var width = canvas.width;
-            var height = canvas.height;
-            if ((x > width / 2 - 75) && (x < width / 2 - 75 + 150) && (y > height / 2 + 20) && (y < height / 2 + 50)) {
-                resButton = true;
-            } else {
-                resButton = false;
-            }
-
-        }
+//
+//        function mouseMoveHandler(evt) {
+//            if (gameState == 2) {
+//                //Game is over, watch for mouse to enter button. 
+//                var rect = canvas.getBoundingClientRect();
+//                mousex = Math.round((evt.clientX - rect.left) / (rect.right - rect.left) * canvas.width);
+//                mousey = Math.round((evt.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height);
+//                inResButton(mousex, mousey);
+//
+//
+//                console.log("Mouse x,y : " + mousex + " , " + mousey);
+//            }
+//        }
+//
+//        function mouseClickHandler(e) {
+//            if (resButton == true) {
+//                //Then restart game. 
+//                gameState = 1;
+//                snake = {
+//                    scale: 14,
+//                    xspeed: 1,
+//                    yspeed: 0,
+//                    length: 1,
+//                    x: 350,
+//                    y: 294
+//                }
+//                tail = [
+//                    [snake.x, snake.y]
+//                ];
+//
+//                resButton = false;
+//            }
+//        }
+//
+//        function inResButton(x, y) {
+//            console.log("Resbutton");
+//            //Check if coords inside restart button. 
+//            var width = canvas.width;
+//            var height = canvas.height;
+//            if ((x > width / 2 - 75) && (x < width / 2 - 75 + 150) && (y > height / 2 + 20) && (y < height / 2 + 50)) {
+//                resButton = true;
+//            } else {
+//                resButton = false;
+//            }
+//
+//        }
 
     </script>
 </body>
