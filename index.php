@@ -166,7 +166,7 @@
 			loop(){
 				//Game states: 0 = paused, 1 = normal, 2 = gameover
 				if(this.gameState == 1){
-					if(this.foodArray.length <= (this.snake.length + 1) / 2){
+					if(this.foodArray.length <= 4){
 						this.makeFood();
 					}
 					//Do normal game things
