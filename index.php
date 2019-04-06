@@ -108,7 +108,7 @@
 
 
 					<div class="difficulty">Medium</div>
-					<input class="diff-slider" type="range" min="150" max="300" value="200" />
+					<input class="diff-slider" type="range" min="0" max="100" value="50" />
 					<div class="main-button start"> Start </div>
 				</div>
 			</div>
@@ -118,6 +118,7 @@
 			</div>
 			<div class="menu over">
 			<div class="title"> Game Over </div>
+			<div class="main-button reset"> Restart </div>
 			</div>
 			<canvas id="scanvas"></canvas>
 		</div>

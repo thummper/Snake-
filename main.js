@@ -1,3 +1,17 @@
+/* 
+TODO:
+
+Change how gameloop works to factor in difficulty
+Make difficulty slider more generic
+Make score work
+Add functionality to gameover menu 
+Buffer control input to prevent missing commands (may be fixed by new loop system)
+
+
+
+*/
+
+
 class Game{
     constructor(canvas){
 
@@ -26,7 +40,7 @@ class Game{
         this.gameLoop;
 
 
-        this.difficulty = 150;
+        this.difficulty = 50;
         this.score = 0;
 
         // Elements on the menus with dynamic content
@@ -35,6 +49,8 @@ class Game{
 
         this.state = 1;
         this.prevState = null;
+        this.lastTime = null;
+        this.timer = 0;
 
         // References to menus 
         this.main = document.getElementsByClassName("main")[0];
@@ -51,18 +67,19 @@ class Game{
         this.addListeners();
         this.setupCanvas();
         this.makeFood();
-        this.gameLoop = window.setInterval(this.loop.bind(this), 150);
+        
+        this.loop();
     }
 
     getDifficulty(diffNumber){
         this.difficulty = diffNumber;
         console.log("Diff Number: ", diffNumber);
         let diffString = "NULL";
-        if(diffNumber <= 175){
+        if(diffNumber <= 30){
             diffString = "Easy";
-        } else if(diffNumber <= 225){
+        } else if(diffNumber <= 70){
             diffString = "Medium";
-        } else if(diffNumber <= 300 ){
+        } else if(diffNumber <= 100 ){
             diffString = "Hard";
         }
         return diffString;
@@ -70,6 +87,12 @@ class Game{
     }
 
     addListeners(){
+
+        document.getElementsByClassName("reset")[0].addEventListener("click", function(){
+            // Reset game and go to main menu. 
+            this.reset();
+            this.switchState(1);
+        }.bind(this));
 
         document.getElementsByClassName("start")[0].addEventListener("click", function(evt){
             console.log("Start button pressed, should start game");
@@ -233,18 +256,44 @@ class Game{
         }.bind(this));
     }
     loop(){
-        if(this.state == 2){
-            // Game is playing
-            if(this.foodArray.length <= 4){
-                this.makeFood();
-            }
-            //Do normal game things
-            this.clearScreen();
-            this.snakeEat();
-            this.drawFood();
-            this.drawSnake();
-            this.moveSnake();
+        let time = performance.now();
+        let lastTime = this.lastTime;
+        if(this.lastTime == null){
+            lastTime = time;
         }
+        let timePassed = time - lastTime;
+        this.lastTime = time; 
+        console.log("Frame Time: ", timePassed);
+
+
+
+        this.timer += timePassed; 
+        let moveTime = 110 - (this.difficulty * 0.3);
+        console.log("Move time: ", moveTime);
+        if(this.timer >= moveTime){
+            this.timer = 0;
+            if(this.state == 2){
+                // Game is playing
+                if(this.foodArray.length <= 4){
+                    this.makeFood();
+                }
+                //Do normal game things
+                this.clearScreen();
+                this.snakeEat();
+                this.drawFood();
+                this.drawSnake();
+                this.moveSnake();
+            }
+        }
+
+        // Time since last frame in ms 
+
+
+
+
+
+
+        window.requestAnimationFrame(this.loop.bind(this));
     }
     clearScreen(){
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
