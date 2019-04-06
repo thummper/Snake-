@@ -40,13 +40,14 @@
 			width: 90%;
 			height: 90%;
 			align-self: center;
-			display: flex;
+			display: none;
 			flex-direction: column;
 			justify-content: center;
 			align-items: center;
 		}
 		.main{
 			z-index: 10;
+			display: flex;
 		}
 		#scanvas{
 			background: white;
@@ -65,6 +66,8 @@
 			margin: 12px 0;
 			border-radius: 4px;
 			cursor: pointer;
+			user-select: none;
+			-moz-user-select: -moz-none;
 		}
 		.main-button:hover{
 			background: #004d4d;
@@ -109,8 +112,13 @@
 					<div class="main-button start"> Start </div>
 				</div>
 			</div>
-			<div class="menu paused"></div>
-			<div class="menu over"></div>
+			<div class="menu paused">
+				<div class="title"> Paused </div>
+			
+			</div>
+			<div class="menu over">
+			<div class="title"> Game Over </div>
+			</div>
 			<canvas id="scanvas"></canvas>
 		</div>
 	</div>

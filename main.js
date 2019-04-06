@@ -31,10 +31,19 @@ class Game{
 
         // Elements on the menus with dynamic content
         this.diffDisplay = document.getElementsByClassName("difficulty")[0];
-        console.log("DIFF: ", this.diffDisplay);
         // States as follow: 1 - main menu, 2 - playing, 3 - paused, 4 - gave over
 
         this.state = 1;
+        this.prevState = null;
+
+        // References to menus 
+        this.main = document.getElementsByClassName("main")[0];
+        this.paused = document.getElementsByClassName("paused")[0];
+        this.over = document.getElementsByClassName("over")[0];
+        this.states = [];
+        this.states[1] = this.main;
+        this.states[3] = this.paused;
+        this.states[4] = this.over;
 
     }
     init(){
@@ -43,7 +52,6 @@ class Game{
         this.setupCanvas();
         this.makeFood();
         this.gameLoop = window.setInterval(this.loop.bind(this), 150);
-        
     }
 
     getDifficulty(diffNumber){
@@ -62,16 +70,17 @@ class Game{
     }
 
     addListeners(){
-        document.getElementsByClassName("diff-slider")[0].addEventListener("input", function(e){
-            console.log(e.target.value);
-            let selDiff = e.target.value;
-            let difficulty = this.getDifficulty(selDiff);
-            this.diffDisplay.innerHTML = difficulty;
 
-
-            
+        document.getElementsByClassName("start")[0].addEventListener("click", function(evt){
+            console.log("Start button pressed, should start game");
+            this.switchState(2); // Switch to playing 
         }.bind(this));
 
+        document.getElementsByClassName("diff-slider")[0].addEventListener("input", function(e){
+            let selDiff = e.target.value;
+            let difficulty = this.getDifficulty(selDiff);
+            this.diffDisplay.innerHTML = difficulty;  
+        }.bind(this));
 
         document.addEventListener('keydown', function(e){
             let kc = e.keyCode;
@@ -102,11 +111,9 @@ class Game{
                     this.snake.yspeed = 0;
                 }
             } else if(kc == 80){
-                if(this.gameState != 0){
-                    this.gameState = 0;
-                } else {
-                    this.gameState = 1;
-                }
+                console.log("Pause button pressed");
+                this.switchState(3); // switch to pause 
+
             } else if(kc == 82){
                 //Reset
                 this.reset();
@@ -119,6 +126,64 @@ class Game{
         this.canvas.addEventListener('click', function(e){
             console.log("Clicked at: ", e.offsetX, e.offsetY);
         }.bind(this));
+    }
+
+    clearMenus(){
+        let menus = this.states; 
+        for(let key in menus){
+            let menu = this.states[key];
+            menu.style.display = "none";
+            menu.style.zIndex = "-3px";
+
+        }
+    }
+
+    showMenu(menus, state){
+        let menu = menus[state];
+        console.log("state");
+        console.log("menu: ", menu);
+        menu.style.display = "flex";
+        menu.style.zIndex - "10px";
+        this.prevState = this.state;
+        this.state = state;
+    }
+
+    switchState(state){
+        //Switch to new state, should change gamestate and possibly canvas layer 
+        // States as follow: 1 - main menu, 2 - playing, 3 - paused, 4 - gave over
+        console.log("Attempting switch to: ", state);
+        let menus = this.states;
+        this.clearMenus();
+
+        if(state == 1){
+            // switch to main menu
+            this.showMenu(menus, state); 
+
+
+        } else if(state == 2){
+            // switch to playing 
+            this.prevState = this.state;
+            this.state = state;
+          
+
+
+        } else if(state == 3){
+            // switch to pause screen
+            if(this.state == 3){
+                if(this.prevState != null){
+                    this.switchState(this.prevState);
+                } else {
+                    this.switchState(2);
+                }
+             
+            } else {
+                this.showMenu(menus, state); 
+
+            }
+        } else if(state == 4){
+            // switch to game over
+            this.showMenu(menus, state); 
+        }
     }
     
     reset(){
@@ -152,6 +217,8 @@ class Game{
 
     setupCanvas(){
         console.log("Setting up canvas");
+        this.canvas.width = this.canvas.offsetWidth;
+        this.canvas.height = this.canvas.offsetHeight;
         //Scale canvas width / height
         window.addEventListener("resize", function(){
             this.canvas.width = this.canvas.offsetWidth;
@@ -166,10 +233,7 @@ class Game{
         }.bind(this));
     }
     loop(){
-        if(this.state == 1){
-            // Display main menu
-
-        } else if(this.state == 2){
+        if(this.state == 2){
             // Game is playing
             if(this.foodArray.length <= 4){
                 this.makeFood();
@@ -180,23 +244,7 @@ class Game{
             this.drawFood();
             this.drawSnake();
             this.moveSnake();
-
-
-
-
-        } else if(this.state == 3){
-            // Game is paused
-
-        } else if(this.state == 4){
-            // Game is over 
-
         }
-
-
-
-
-        
-
     }
     clearScreen(){
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -284,10 +332,11 @@ class Game{
         if((snake.x + (snake.xspeed * snake.scale)) > this.canvas.width - 14 || (snake.x + (snake.xspeed * snake.scale ))< 0){
            //Hit a wall.
            console.log("Hit left or right");
+           this.switchState(4);
            this.gameState = 2;
            } else if(snake.y + (snake.yspeed * snake.scale) < 0 || snake.y + (snake.yspeed * snake.scale) > this.canvas.height - 14){
                //Hit a wall
-               this.gameState = 2;
+               this.switchState(4);
                console.log("Hit top or bottom");
            } else {
                //Didn't hit a wall.
