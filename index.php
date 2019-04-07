@@ -41,9 +41,19 @@
 			height: 90%;
 			align-self: center;
 			display: none;
+			background: transparent;
 			flex-direction: column;
 			justify-content: center;
 			align-items: center;
+		}
+		.menu-bg{
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			background: gray;
+			z-index: -1;
+			opacity: 0.5;
+			filter: blur(2px);
 		}
 		.main{
 			z-index: 10;
@@ -88,6 +98,9 @@
 			font-size: 100px;
 			font-family: "Delius Swash Caps";
 		}
+		.over .title{
+			width: 100%;
+		}
 		.difficulty{
 			text-align: center;
 		}
@@ -103,6 +116,7 @@
 		<div class="controls"></div>
 		<div class="canvas-wrapper">
 			<div class="menu main">
+				<div class="menu-bg"></div>
 				<div class="title"> Snake </div>
 				<div class="main-controls">
 
@@ -113,10 +127,12 @@
 				</div>
 			</div>
 			<div class="menu paused">
+				<div class="menu-bg"></div>
 				<div class="title"> Paused </div>
 			
 			</div>
 			<div class="menu over">
+			<div class="menu-bg"></div>	
 			<div class="title"> Game Over </div>
 			<div class="main-button reset"> Restart </div>
 			</div>

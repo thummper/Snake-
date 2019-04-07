@@ -1,10 +1,8 @@
 /* 
 TODO:
 
-Change how gameloop works to factor in difficulty
-Make difficulty slider more generic
+
 Make score work
-Add functionality to gameover menu 
 Buffer control input to prevent missing commands (may be fixed by new loop system)
 
 
@@ -38,6 +36,7 @@ class Game{
             [this.snake.x, this.snake.y]
         ];
         this.gameLoop;
+        this.effects = [];
 
 
         this.difficulty = 50;
@@ -156,7 +155,7 @@ class Game{
         for(let key in menus){
             let menu = this.states[key];
             menu.style.display = "none";
-            menu.style.zIndex = "-3px";
+            menu.style.zIndex = "-3";
 
         }
     }
@@ -166,7 +165,7 @@ class Game{
         console.log("state");
         console.log("menu: ", menu);
         menu.style.display = "flex";
-        menu.style.zIndex - "10px";
+        menu.style.zIndex = "10";
         this.prevState = this.state;
         this.state = state;
     }
@@ -263,13 +262,13 @@ class Game{
         }
         let timePassed = time - lastTime;
         this.lastTime = time; 
-        console.log("Frame Time: ", timePassed);
+        
 
 
 
         this.timer += timePassed; 
         let moveTime = 110 - (this.difficulty * 0.3);
-        console.log("Move time: ", moveTime);
+        
         if(this.timer >= moveTime){
             this.timer = 0;
             if(this.state == 2){
@@ -281,6 +280,7 @@ class Game{
                 this.clearScreen();
                 this.snakeEat();
                 this.drawFood();
+                this.drawEffects();
                 this.drawSnake();
                 this.moveSnake();
             }
@@ -308,6 +308,8 @@ class Game{
             for(let a = len; a >= 0; a--){
                 let food = this.foodArray[a];
                 if(food.x == x && food.y == y){
+                    // Snake has eaten food
+                    this.effects.push({type: "text", value: "+1", age: 0, life: 10, random: 2, x: x, y: y, delete: false}); 
                     this.snake.length++;
                     this.foodArray.splice(a, 1);
                 }
@@ -320,6 +322,48 @@ class Game{
             this.drawRect(food.x, food.y, 'red', this.snake.scale);
         }
     }
+
+    drawText(x, y, color, value, opacity){
+       
+        
+        this.ctx.fillStyle = color + opacity + ")";
+        this.ctx.font = "26px Arial";
+        this.ctx.fillText(value, x, y);
+        
+
+
+
+  
+    }
+
+    drawEffects(){
+        for(let i = this.effects.length - 1; i >= 0; i--){
+            let effect = this.effects[i];
+
+            if(effect.delete){
+                this.effects.splice(i, 1);
+                continue;
+
+            } else {
+               
+                let x = effect.x + (effect.age * effect.random);
+                let y = effect.y - (effect.age * effect.random);
+                let opacity = (1 * (effect.life / (effect.age + 1))) / effect.life;
+                console.log("Opac: ", opacity);
+                this.drawText(x, y, "rgba(0, 0, 0, ", effect.value, opacity);
+
+    
+                effect.age++; 
+                if(effect.age >= effect.life){
+                    effect.delete = true;
+                }
+            }
+        }
+
+
+    }
+
+
     drawSnake(){
         let snake = this.snake;
         let tail = this.tail;
@@ -351,11 +395,12 @@ class Game{
         }	
     }
     drawRect(x, y, col, size){
-        this.ctx.beginPath();
+        
         this.ctx.fillStyle = col;
         this.ctx.rect(x, y, size, size);
         this.ctx.fill();
-        this.ctx.closePath();
+        this.ctx.beginPath();
+        
     }
     snakeDir(){
         let dir = null;
