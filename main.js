@@ -55,6 +55,7 @@ class Game{
         this.main = document.getElementsByClassName("main")[0];
         this.paused = document.getElementsByClassName("paused")[0];
         this.over = document.getElementsByClassName("over")[0];
+        this.scoreHolder = document.getElementsByClassName("score-holder")[0];
         this.states = [];
         this.states[1] = this.main;
         this.states[3] = this.paused;
@@ -233,7 +234,7 @@ class Game{
     //Makes x pieces of food
     makeFood(){
         let food = new Food();
-        food.pickLocation();
+        food.pickLocation(this.canvas.width, this.canvas.height);
         this.foodArray.push(food);
     }
 
@@ -311,6 +312,8 @@ class Game{
                     // Snake has eaten food
                     this.effects.push({type: "text", value: "+1", age: 0, life: 10, random: 2, x: x, y: y, delete: false}); 
                     this.snake.length++;
+                    this.score++;
+                    this.scoreHolder.innerHTML = "Score: " + this.score;
                     this.foodArray.splice(a, 1);
                 }
             }	
