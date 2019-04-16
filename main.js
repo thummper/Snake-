@@ -1,15 +1,3 @@
-/* 
-TODO:
-
-
-Make score work
-Buffer control input to prevent missing commands (may be fixed by new loop system)
-
-
-
-*/
-
-
 class Game{
     constructor(canvas){
 
@@ -18,10 +6,8 @@ class Game{
         //Game vars
         this.movex = 0;
         this.movey = 0;
-        this.foodArray = [];
+        this.foodList = [];
         this.gameState = 1;
-        this.mousex;
-        this.mousey;
         this.move = 0;
         this.resButtons = false;
         this.snake = {
@@ -141,13 +127,6 @@ class Game{
                 //Reset
                 this.reset();
             }
-            
-        }.bind(this));
-        this.canvas.addEventListener('mousemove', function(e){
-            console.log("Mouse X/Y: ", e.offsetX, e.offsetY);
-        }.bind(this));
-        this.canvas.addEventListener('click', function(e){
-            console.log("Clicked at: ", e.offsetX, e.offsetY);
         }.bind(this));
     }
 
@@ -213,7 +192,7 @@ class Game{
         //Reset game.
         this.movex = 0;
         this.movey = 0;
-        this.foodArray = [];
+        this.foodList = [];
         this.gameState = 1;
         this.mousex;
         this.mousey;
@@ -235,7 +214,7 @@ class Game{
     makeFood(){
         let food = new Food();
         food.pickLocation(this.canvas.width, this.canvas.height);
-        this.foodArray.push(food);
+        this.foodList.push(food);
     }
 
     setupCanvas(){
@@ -274,7 +253,7 @@ class Game{
             this.timer = 0;
             if(this.state == 2){
                 // Game is playing
-                if(this.foodArray.length <= 4){
+                if(this.foodList.length <= 4){
                     this.makeFood();
                 }
                 //Do normal game things
@@ -305,23 +284,23 @@ class Game{
             let block = this.tail[i];
             let x = block[0];
             let y = block[1];
-            let len = this.foodArray.length - 1;
+            let len = this.foodList.length - 1;
             for(let a = len; a >= 0; a--){
-                let food = this.foodArray[a];
+                let food = this.foodList[a];
                 if(food.x == x && food.y == y){
                     // Snake has eaten food
                     this.effects.push({type: "text", value: "+1", age: 0, life: 10, random: 2, x: x, y: y, delete: false}); 
                     this.snake.length++;
                     this.score++;
                     this.scoreHolder.innerHTML = "Score: " + this.score;
-                    this.foodArray.splice(a, 1);
+                    this.foodList.splice(a, 1);
                 }
             }	
         }
     }
     drawFood(){	
-        for(let i = 0, j = this.foodArray.length; i < j; i++){
-            let food = this.foodArray[i];
+        for(let i = 0, j = this.foodList.length; i < j; i++){
+            let food = this.foodList[i];
             this.drawRect(food.x, food.y, 'red', this.snake.scale);
         }
     }
@@ -352,7 +331,6 @@ class Game{
                 let x = effect.x + (effect.age * effect.random);
                 let y = effect.y - (effect.age * effect.random);
                 let opacity = (1 * (effect.life / (effect.age + 1))) / effect.life;
-                console.log("Opac: ", opacity);
                 this.drawText(x, y, "rgba(0, 0, 0, ", effect.value, opacity);
 
     
@@ -449,111 +427,65 @@ class Game{
     }
 }
 
+class Tabs{
+    constructor(buttonHolder, tabHolder){
+        this.buttonHolder = buttonHolder;
+        this.tabHolder = tabHolder;
+        this.buttons, this.tabs;
+        this.init();
+    }
+    init(){
+        let buttons = this.buttonHolder.getElementsByClassName("tab-button");
+        this.buttons = buttons;
+        let tabs = this.tabHolder.getElementsByClassName("tab");
+        this.tabs = tabs;
+        for(let button of buttons){
+            button.addEventListener("click", function(event){
+                let tabPressed = event.target.dataset.tab;
+                this.activeTab(tabPressed);
+            }.bind(this));
+        }
+    }
+    activeTab(tabID){
+        let tabs = this.tabs;
+        for(let tab of tabs){
+            tab.style.display = "none";
+            let id = tab.id;
+            if(id == tabID){
+                tab.style.display = "flex";
+            }
+        }
+        let buttons = this.buttons;
+        for(let button of buttons){
+            if(button.dataset.tab == tabID){
+                button.classList.add("active");
+            } else {
+                button.classList.remove("active");
+            }
+        }
+    }
+}
+
+
+
 
 
 
 
 window.addEventListener("load", function(e){
+    console.log("Making tabs");
+    let tabs = new Tabs(document.getElementsByClassName("tabs")[0], document.getElementsByClassName("tab-holder")[0]);
+
+
     console.log("Making game");
     let game = new Game(document.getElementById('scanvas'));
     game.init();
+
+
+
 });
 
 
 
-function drawGameOver() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.beginPath();
-    ctx.fillStyle = "black";
-    //Box for GameOver text. 
-    ctx.fillRect(canvas.width / 2 - 150, canvas.height / 2 - 50, 300, 50);
-    ctx.fill();
-
-    if (resButton) {
-        //Make button change.
-        ctx.fillStyle = "yellow";
-        ctx.fillRect(canvas.width / 2 - 75, canvas.height / 2 + 20, 150, 30);
-        ctx.fill();
-
-    } else {
-        //Normal button.
-        //Box for restart button.
-        ctx.fillStyle = "black";
-        ctx.fillRect(canvas.width / 2 - 75, canvas.height / 2 + 20, 150, 30);
-        ctx.fill();
-    }
-
-    //All text stuff here.
-    ctx.beginPath();
-    ctx.font = "30px arial";
-    ctx.fillStyle = "red";
-    ctx.fillText("Game Over", canvas.width / 2 - 70, canvas.height / 2 - 12);
-    ctx.font = "16px arial";
-    ctx.fillText("Restart?", canvas.width / 2 - 28, canvas.height / 2 + 40);
-}
-function drawScore() {
-    //Draws score. 
-    ctx.beginPath();
-    ctx.fillStyle = "black";
-    ctx.font = "16px Arial";
-    ctx.fillText("Score: " + (snake.length - 1), 10, 20);
-}
 
 
-//            //Check if snake is touching itself. 
-//            for (i = 1; i < snake.length; i++) {
-//                if (snake.x == tail[i][0] && snake.y == tail[i][1]) {
-//                    //Snake is touching itself - Lose Score??
-//                    console.log("Touched Self.");
-//                    snake.length -= 1;
-//                }
-//            }
-
-
-
-//
-//        function mouseMoveHandler(evt) {
-//            if (gameState == 2) {
-//                //Game is over, watch for mouse to enter button. 
-//                var rect = canvas.getBoundingClientRect();
-//                mousex = Math.round((evt.clientX - rect.left) / (rect.right - rect.left) * canvas.width);
-//                mousey = Math.round((evt.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height);
-//                inResButton(mousex, mousey);
-//
-//
-//                console.log("Mouse x,y : " + mousex + " , " + mousey);
-//            }
-//        }
-//
-//        function mouseClickHandler(e) {
-//            if (resButton == true) {
-//                //Then restart game. 
-//                gameState = 1;
-//                snake = {
-//                    scale: 14,
-//                    xspeed: 1,
-//                    yspeed: 0,
-//                    length: 1,
-//                    x: 350,
-//                    y: 294
-//                }
-//                tail = [
-//                    [snake.x, snake.y]
-//                ];
-//
-//                resButton = false;
-//            }
-//        }
-//
-//        function inResButton(x, y) {
-//            console.log("Resbutton");
-//            //Check if coords inside restart button. 
-//            var width = canvas.width;
-//            var height = canvas.height;
-//            if ((x > width / 2 - 75) && (x < width / 2 - 75 + 150) && (y > height / 2 + 20) && (y < height / 2 + 50)) {
-//                resButton = true;
-//            } else {
-//                resButton = false;
-//            }
-//
-//        }
