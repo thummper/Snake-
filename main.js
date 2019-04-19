@@ -23,7 +23,8 @@ class Game{
         ];
         this.gameLoop;
         this.effects = [];
-
+        this.gameTime = 0;
+        this.statistics = [];
 
         this.difficulty = 50;
         this.score = 0;
@@ -46,12 +47,15 @@ class Game{
         this.states[1] = this.main;
         this.states[3] = this.paused;
         this.states[4] = this.over;
+        this.chart = null;
+        this.chartOptions = null;
 
     }
     init(){
         //Set everything up
         this.addListeners();
         this.setupCanvas();
+        this.initCharts();
         this.makeFood();
         
         this.loop();
@@ -184,9 +188,41 @@ class Game{
             }
         } else if(state == 4){
             // switch to game over
+            this.statistics.push( [Math.round(this.gameTime / 1000), this.score] );
+            console.log(this.statistics);
+           
+            this.updateChart();
+            //Should store gametime and score in an array
             this.showMenu(menus, state); 
         }
     }
+
+    initCharts(){
+        this.chart = echarts.init(document.getElementById("score-time-chart"));
+      
+        let options = {
+            title: {
+                text: "Score / Game Time",
+                left: "center",
+            },
+            xAxis: {},
+            yAxis: {},
+            series: [{
+                symbolSize: 20,
+                data: this.statistics,
+                type: 'scatter'
+            }]
+        };
+        
+        this.chartOptions = options;
+        this.chart.setOption(options);
+    }
+
+    updateChart(){
+        // Update series?
+        this.chart.setOption(this.chartOptions);
+    }
+
     
     reset(){
         //Reset game.
@@ -197,6 +233,7 @@ class Game{
         this.mousex;
         this.mousey;
         this.move = 0;
+        this.gameTime = 0;
         this.resButtons = false;
         this.snake = {
             scale: 14,
@@ -225,6 +262,10 @@ class Game{
         window.addEventListener("resize", function(){
             this.canvas.width = this.canvas.offsetWidth;
             this.canvas.height = this.canvas.offsetHeight;
+
+            if(this.chart !== null){
+                this.chart.resize();
+            }
             console.log("Canvas resized");
 
             if(this.canvas.width < 300){
@@ -234,7 +275,9 @@ class Game{
 
         }.bind(this));
     }
+
     loop(){
+
         let time = performance.now();
         let lastTime = this.lastTime;
         if(this.lastTime == null){
@@ -242,10 +285,7 @@ class Game{
         }
         let timePassed = time - lastTime;
         this.lastTime = time; 
-        
-
-
-
+        this.gameTime += timePassed;
         this.timer += timePassed; 
         let moveTime = 110 - (this.difficulty * 0.3);
         
@@ -267,14 +307,9 @@ class Game{
         }
 
         // Time since last frame in ms 
-
-
-
-
-
-
         window.requestAnimationFrame(this.loop.bind(this));
     }
+
     clearScreen(){
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
@@ -306,44 +341,30 @@ class Game{
     }
 
     drawText(x, y, color, value, opacity){
-       
-        
         this.ctx.fillStyle = color + opacity + ")";
         this.ctx.font = "26px Arial";
         this.ctx.fillText(value, x, y);
-        
-
-
-
-  
     }
 
     drawEffects(){
         for(let i = this.effects.length - 1; i >= 0; i--){
             let effect = this.effects[i];
-
             if(effect.delete){
                 this.effects.splice(i, 1);
                 continue;
-
             } else {
                
                 let x = effect.x + (effect.age * effect.random);
                 let y = effect.y - (effect.age * effect.random);
                 let opacity = (1 * (effect.life / (effect.age + 1))) / effect.life;
                 this.drawText(x, y, "rgba(0, 0, 0, ", effect.value, opacity);
-
-    
                 effect.age++; 
                 if(effect.age >= effect.life){
                     effect.delete = true;
                 }
             }
         }
-
-
     }
-
 
     drawSnake(){
         let snake = this.snake;
@@ -375,14 +396,14 @@ class Game{
             }
         }	
     }
+
     drawRect(x, y, col, size){
-        
         this.ctx.fillStyle = col;
         this.ctx.rect(x, y, size, size);
         this.ctx.fill();
-        this.ctx.beginPath();
-        
+        this.ctx.beginPath();   
     }
+
     snakeDir(){
         let dir = null;
         if(this.snake.yspeed == -1){
@@ -402,6 +423,7 @@ class Game{
             return "L";
         }
     }
+
     moveSnake(){
         let snake = this.snake;
         if((snake.x + (snake.xspeed * snake.scale)) > this.canvas.width - 14 || (snake.x + (snake.xspeed * snake.scale ))< 0){
@@ -432,7 +454,9 @@ class Tabs{
         this.buttonHolder = buttonHolder;
         this.tabHolder = tabHolder;
         this.buttons, this.tabs;
+ 
         this.init();
+        
     }
     init(){
         let buttons = this.buttonHolder.getElementsByClassName("tab-button");
@@ -449,10 +473,10 @@ class Tabs{
     activeTab(tabID){
         let tabs = this.tabs;
         for(let tab of tabs){
-            tab.style.display = "none";
+            tab.style.visibility = "hidden";
             let id = tab.id;
             if(id == tabID){
-                tab.style.display = "flex";
+                tab.style.visibility = "visible";
             }
         }
         let buttons = this.buttons;
@@ -474,15 +498,9 @@ class Tabs{
 
 window.addEventListener("load", function(e){
     console.log("Making tabs");
-    let tabs = new Tabs(document.getElementsByClassName("tabs")[0], document.getElementsByClassName("tab-holder")[0]);
-
-
-    console.log("Making game");
     let game = new Game(document.getElementById('scanvas'));
+    let tabs = new Tabs(document.getElementsByClassName("tabs")[0], document.getElementsByClassName("tab-holder")[0]);
     game.init();
-
-
-
 });
 
 

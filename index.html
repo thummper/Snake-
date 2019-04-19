@@ -5,6 +5,7 @@
 	<meta charset="utf-8" />
 	<title> Snake Game </title>
 	<meta name="description" content="A simple JS snake game." />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.2.1/echarts-en.js"></script>
 	<link href="https://fonts.googleapis.com/css?family=Delius+Swash+Caps" rel="stylesheet">
 	<link rel="stylesheet" href="style.css">
 	<meta name="author" content="Aron" />
@@ -51,7 +52,16 @@
 					</div>
 					<canvas id="scanvas"></canvas>
 				</div>
-				<div class="tab stats-wrapper" id="statsTab"></div>
+				<div class="tab stats-wrapper" id="statsTab">
+					<div class="title">
+						Statistics
+					</div>
+					<div class="chart-wrapper">
+						<div id="score-time-chart"></div>
+
+
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
