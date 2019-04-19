@@ -232,6 +232,7 @@ class Game{
         this.gameState = 1;
         this.mousex;
         this.mousey;
+        this.score = 0;
         this.move = 0;
         this.gameTime = 0;
         this.resButtons = false;
